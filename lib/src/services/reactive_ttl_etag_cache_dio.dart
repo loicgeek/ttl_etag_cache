@@ -8,7 +8,7 @@ import '../models/cached_ttl_etag_response.dart';
 class ReactiveCacheDio {
   static ReactiveCacheDio? _instance;
   late Isar isar;
-  final Dio _dio = Dio();
+  late Dio _dio;
 
   final StreamController<void> _updateStreamController =
       StreamController.broadcast();
@@ -17,7 +17,8 @@ class ReactiveCacheDio {
   ReactiveCacheDio._();
   factory ReactiveCacheDio() => _instance ??= ReactiveCacheDio._();
 
-  Future<void> init() async {
+  Future<void> init({Dio? dio}) async {
+    _dio = dio ?? Dio();
     final dir = await getApplicationDocumentsDirectory();
     isar = await Isar.open([CachedTtlEtagResponseSchema], directory: dir.path);
   }
