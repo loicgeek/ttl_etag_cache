@@ -4,10 +4,25 @@ A new Flutter plugin project.
 
 ## Getting Started
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/to/develop-plugins),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+Add the package to your pubspec.yaml file:
+
+```yaml
+dependencies:
+  neero_ttl_etag_cache: ^0.0.1
+```
+
+Initialize the cache:
+
+```Dart
+ReactiveCacheDio().init();
+```
+
+You can optionally pass a Dio instance to the init method:
+
+```Dart
+ReactiveCacheDio().init(dio: Dio());
+```
+
 
 ## Example
 ```Dart
