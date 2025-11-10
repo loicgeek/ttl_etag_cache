@@ -7,6 +7,7 @@ export 'src/services/encryption_service.dart';
 export 'src/models/cached_ttl_etag_response.dart';
 export 'src/models/cache_ttl_etag_state.dart';
 export 'src/repositories/cached_ttl_etag_repository.dart';
+export 'src/interceptors/cache_ttl_etag_interceptor.dart';
 
 /// Main entry point for Neero TTL/ETag Cache
 ///

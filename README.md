@@ -39,9 +39,41 @@ flutter pub get
 
 ## 🚀 Quick Start
 
-### 1. Initialize the Cache
+### Method 1: Interceptor (Easiest - 3 Lines!)
 
-Initialize the cache system in your app's entry point:
+Perfect for adding caching to **existing apps** with zero code changes:
+
+```dart
+import 'package:neero_ttl_etag_cache/neero_ttl_etag_cache.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  final dio = Dio();
+  
+  // Add these 3 lines - that's it!
+  dio.interceptors.add(
+    CacheTtlEtagInterceptor(
+      enableEncryption: true,
+      defaultTtl: Duration(minutes: 5),
+    ),
+  );
+  
+  runApp(MyApp());
+}
+
+// Your existing Dio code works unchanged!
+final response = await dio.get('https://api.example.com/users');
+// ✨ Now automatically cached with TTL and ETag support!
+```
+
+**That's it!** All your GET requests are now cached. [See Interceptor Guide →](doc/INTERCEPTOR_GUIDE.md)
+
+---
+
+### Method 2: Repository Pattern (Recommended for New Code)
+
+For clean architecture with reactive state management:
 
 ```dart
 import 'package:neero_ttl_etag_cache/neero_ttl_etag_cache.dart';
@@ -215,6 +247,24 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 }
 ```
+
+### Which Approach Should I Use?
+
+| Feature | Interceptor 🚀 | Repository Pattern 🏗️ |
+|---------|---------------|----------------------|
+| **Setup Time** | 3 lines of code | Moderate refactoring |
+| **Existing Code** | Works as-is ✅ | Requires changes |
+| **State Management** | Manual | Automatic (reactive) |
+| **UI Updates** | Call setState() | StreamBuilder auto-updates |
+| **Learning Curve** | Minimal | Medium |
+| **Best For** | Quick wins, existing apps | Clean architecture, new features |
+
+**Quick Decision:**
+- 🚀 **Use Interceptor** if you want caching NOW with zero refactoring
+- 🏗️ **Use Repository** if you're building new features or want reactive streams
+- 💡 **Use Both!** They work together perfectly
+
+[→ Interceptor Guide](doc/INTERCEPTOR_GUIDE.md) | [→ Repository Guide](#2-create-a-repository)
 
 ## 📚 Core Concepts
 
