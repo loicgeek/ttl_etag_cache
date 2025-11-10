@@ -44,7 +44,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.neero.ttl_etag_cache
+        package: com.example.neero_ttl_etag_cache
         pluginClass: NeeroTtlEtagCachePlugin
       ios:
         pluginClass: NeeroTtlEtagCachePlugin

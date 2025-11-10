@@ -40,7 +40,7 @@ class HomeScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const UserProfileScreen(userId: '123'),
+                  builder: (context) => const UserProfileScreen(userId: '1'),
                 ),
               );
             },
@@ -109,6 +109,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     super.initState();
     _repository = CachedTtlEtagRepository<User>(
       url: 'https://jsonplaceholder.typicode.com/users/${widget.userId}',
+      headers: {"accept": "application/json"},
       fromJson: (json) => User.fromJson(json),
       defaultTtl: const Duration(minutes: 5),
     );
@@ -246,6 +247,8 @@ class _PostsListScreenState extends State<PostsListScreen> {
     super.initState();
     _repository = CachedTtlEtagRepository<List<Post>>(
       url: 'https://jsonplaceholder.typicode.com/posts',
+      method: "GET",
+      headers: {"accept": "application/json"},
       fromJson: (json) => (json as List).map((e) => Post.fromJson(e)).toList(),
       defaultTtl: const Duration(minutes: 10),
     );

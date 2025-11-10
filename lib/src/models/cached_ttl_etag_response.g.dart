@@ -18,48 +18,63 @@ const CachedTtlEtagResponseSchema = CollectionSchema(
   name: r'CachedTtlEtagResponse',
   id: 3277880744264082073,
   properties: {
-    r'data': PropertySchema(
+    r'ageInSeconds': PropertySchema(
       id: 0,
+      name: r'ageInSeconds',
+      type: IsarType.long,
+    ),
+    r'data': PropertySchema(
+      id: 1,
       name: r'data',
       type: IsarType.string,
     ),
     r'encryptedData': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'encryptedData',
       type: IsarType.string,
     ),
     r'etag': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'etag',
       type: IsarType.string,
     ),
     r'isEncrypted': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'isEncrypted',
       type: IsarType.bool,
     ),
+    r'isExpired': PropertySchema(
+      id: 5,
+      name: r'isExpired',
+      type: IsarType.bool,
+    ),
     r'isStale': PropertySchema(
-      id: 4,
+      id: 6,
       name: r'isStale',
       type: IsarType.bool,
     ),
     r'iv': PropertySchema(
-      id: 5,
+      id: 7,
       name: r'iv',
       type: IsarType.string,
     ),
+    r'remainingTtl': PropertySchema(
+      id: 8,
+      name: r'remainingTtl',
+      type: IsarType.long,
+    ),
     r'timestamp': PropertySchema(
-      id: 6,
+      id: 9,
       name: r'timestamp',
       type: IsarType.dateTime,
     ),
     r'ttlSeconds': PropertySchema(
-      id: 7,
+      id: 10,
       name: r'ttlSeconds',
       type: IsarType.long,
     ),
     r'url': PropertySchema(
-      id: 8,
+      id: 11,
       name: r'url',
       type: IsarType.string,
     )
@@ -145,15 +160,18 @@ void _cachedTtlEtagResponseSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.data);
-  writer.writeString(offsets[1], object.encryptedData);
-  writer.writeString(offsets[2], object.etag);
-  writer.writeBool(offsets[3], object.isEncrypted);
-  writer.writeBool(offsets[4], object.isStale);
-  writer.writeString(offsets[5], object.iv);
-  writer.writeDateTime(offsets[6], object.timestamp);
-  writer.writeLong(offsets[7], object.ttlSeconds);
-  writer.writeString(offsets[8], object.url);
+  writer.writeLong(offsets[0], object.ageInSeconds);
+  writer.writeString(offsets[1], object.data);
+  writer.writeString(offsets[2], object.encryptedData);
+  writer.writeString(offsets[3], object.etag);
+  writer.writeBool(offsets[4], object.isEncrypted);
+  writer.writeBool(offsets[5], object.isExpired);
+  writer.writeBool(offsets[6], object.isStale);
+  writer.writeString(offsets[7], object.iv);
+  writer.writeLong(offsets[8], object.remainingTtl);
+  writer.writeDateTime(offsets[9], object.timestamp);
+  writer.writeLong(offsets[10], object.ttlSeconds);
+  writer.writeString(offsets[11], object.url);
 }
 
 CachedTtlEtagResponse _cachedTtlEtagResponseDeserialize(
@@ -163,16 +181,16 @@ CachedTtlEtagResponse _cachedTtlEtagResponseDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = CachedTtlEtagResponse();
-  object.data = reader.readStringOrNull(offsets[0]);
-  object.encryptedData = reader.readStringOrNull(offsets[1]);
-  object.etag = reader.readStringOrNull(offsets[2]);
+  object.data = reader.readStringOrNull(offsets[1]);
+  object.encryptedData = reader.readStringOrNull(offsets[2]);
+  object.etag = reader.readStringOrNull(offsets[3]);
   object.id = id;
-  object.isEncrypted = reader.readBool(offsets[3]);
-  object.isStale = reader.readBool(offsets[4]);
-  object.iv = reader.readStringOrNull(offsets[5]);
-  object.timestamp = reader.readDateTime(offsets[6]);
-  object.ttlSeconds = reader.readLong(offsets[7]);
-  object.url = reader.readString(offsets[8]);
+  object.isEncrypted = reader.readBool(offsets[4]);
+  object.isStale = reader.readBool(offsets[6]);
+  object.iv = reader.readStringOrNull(offsets[7]);
+  object.timestamp = reader.readDateTime(offsets[9]);
+  object.ttlSeconds = reader.readLong(offsets[10]);
+  object.url = reader.readString(offsets[11]);
   return object;
 }
 
@@ -184,22 +202,28 @@ P _cachedTtlEtagResponseDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 1:
       return (reader.readStringOrNull(offset)) as P;
     case 2:
       return (reader.readStringOrNull(offset)) as P;
     case 3:
-      return (reader.readBool(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 4:
       return (reader.readBool(offset)) as P;
     case 5:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 6:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 7:
-      return (reader.readLong(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 8:
+      return (reader.readLong(offset)) as P;
+    case 9:
+      return (reader.readDateTime(offset)) as P;
+    case 10:
+      return (reader.readLong(offset)) as P;
+    case 11:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -458,6 +482,62 @@ extension CachedTtlEtagResponseQueryWhere on QueryBuilder<CachedTtlEtagResponse,
 
 extension CachedTtlEtagResponseQueryFilter on QueryBuilder<
     CachedTtlEtagResponse, CachedTtlEtagResponse, QFilterCondition> {
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse,
+      QAfterFilterCondition> ageInSecondsEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'ageInSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse,
+      QAfterFilterCondition> ageInSecondsGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'ageInSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse,
+      QAfterFilterCondition> ageInSecondsLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'ageInSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse,
+      QAfterFilterCondition> ageInSecondsBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'ageInSeconds',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse,
       QAfterFilterCondition> dataIsNull() {
     return QueryBuilder.apply(this, (query) {
@@ -993,6 +1073,16 @@ extension CachedTtlEtagResponseQueryFilter on QueryBuilder<
   }
 
   QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse,
+      QAfterFilterCondition> isExpiredEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isExpired',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse,
       QAfterFilterCondition> isStaleEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -1154,6 +1244,62 @@ extension CachedTtlEtagResponseQueryFilter on QueryBuilder<
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'iv',
         value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse,
+      QAfterFilterCondition> remainingTtlEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'remainingTtl',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse,
+      QAfterFilterCondition> remainingTtlGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'remainingTtl',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse,
+      QAfterFilterCondition> remainingTtlLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'remainingTtl',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse,
+      QAfterFilterCondition> remainingTtlBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'remainingTtl',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }
@@ -1418,6 +1564,20 @@ extension CachedTtlEtagResponseQueryLinks on QueryBuilder<CachedTtlEtagResponse,
 extension CachedTtlEtagResponseQuerySortBy
     on QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QSortBy> {
   QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QAfterSortBy>
+      sortByAgeInSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'ageInSeconds', Sort.asc);
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QAfterSortBy>
+      sortByAgeInSecondsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'ageInSeconds', Sort.desc);
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QAfterSortBy>
       sortByData() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'data', Sort.asc);
@@ -1474,6 +1634,20 @@ extension CachedTtlEtagResponseQuerySortBy
   }
 
   QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QAfterSortBy>
+      sortByIsExpired() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isExpired', Sort.asc);
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QAfterSortBy>
+      sortByIsExpiredDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isExpired', Sort.desc);
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QAfterSortBy>
       sortByIsStale() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isStale', Sort.asc);
@@ -1498,6 +1672,20 @@ extension CachedTtlEtagResponseQuerySortBy
       sortByIvDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'iv', Sort.desc);
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QAfterSortBy>
+      sortByRemainingTtl() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'remainingTtl', Sort.asc);
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QAfterSortBy>
+      sortByRemainingTtlDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'remainingTtl', Sort.desc);
     });
   }
 
@@ -1546,6 +1734,20 @@ extension CachedTtlEtagResponseQuerySortBy
 
 extension CachedTtlEtagResponseQuerySortThenBy
     on QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QSortThenBy> {
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QAfterSortBy>
+      thenByAgeInSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'ageInSeconds', Sort.asc);
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QAfterSortBy>
+      thenByAgeInSecondsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'ageInSeconds', Sort.desc);
+    });
+  }
+
   QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QAfterSortBy>
       thenByData() {
     return QueryBuilder.apply(this, (query) {
@@ -1617,6 +1819,20 @@ extension CachedTtlEtagResponseQuerySortThenBy
   }
 
   QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QAfterSortBy>
+      thenByIsExpired() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isExpired', Sort.asc);
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QAfterSortBy>
+      thenByIsExpiredDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isExpired', Sort.desc);
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QAfterSortBy>
       thenByIsStale() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isStale', Sort.asc);
@@ -1641,6 +1857,20 @@ extension CachedTtlEtagResponseQuerySortThenBy
       thenByIvDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'iv', Sort.desc);
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QAfterSortBy>
+      thenByRemainingTtl() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'remainingTtl', Sort.asc);
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QAfterSortBy>
+      thenByRemainingTtlDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'remainingTtl', Sort.desc);
     });
   }
 
@@ -1690,6 +1920,13 @@ extension CachedTtlEtagResponseQuerySortThenBy
 extension CachedTtlEtagResponseQueryWhereDistinct
     on QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QDistinct> {
   QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QDistinct>
+      distinctByAgeInSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'ageInSeconds');
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QDistinct>
       distinctByData({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'data', caseSensitive: caseSensitive);
@@ -1719,6 +1956,13 @@ extension CachedTtlEtagResponseQueryWhereDistinct
   }
 
   QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QDistinct>
+      distinctByIsExpired() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isExpired');
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QDistinct>
       distinctByIsStale() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'isStale');
@@ -1729,6 +1973,13 @@ extension CachedTtlEtagResponseQueryWhereDistinct
       distinctByIv({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'iv', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, CachedTtlEtagResponse, QDistinct>
+      distinctByRemainingTtl() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'remainingTtl');
     });
   }
 
@@ -1762,6 +2013,13 @@ extension CachedTtlEtagResponseQueryProperty on QueryBuilder<
     });
   }
 
+  QueryBuilder<CachedTtlEtagResponse, int, QQueryOperations>
+      ageInSecondsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'ageInSeconds');
+    });
+  }
+
   QueryBuilder<CachedTtlEtagResponse, String?, QQueryOperations>
       dataProperty() {
     return QueryBuilder.apply(this, (query) {
@@ -1791,6 +2049,13 @@ extension CachedTtlEtagResponseQueryProperty on QueryBuilder<
   }
 
   QueryBuilder<CachedTtlEtagResponse, bool, QQueryOperations>
+      isExpiredProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isExpired');
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, bool, QQueryOperations>
       isStaleProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'isStale');
@@ -1800,6 +2065,13 @@ extension CachedTtlEtagResponseQueryProperty on QueryBuilder<
   QueryBuilder<CachedTtlEtagResponse, String?, QQueryOperations> ivProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'iv');
+    });
+  }
+
+  QueryBuilder<CachedTtlEtagResponse, int, QQueryOperations>
+      remainingTtlProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'remainingTtl');
     });
   }
 
