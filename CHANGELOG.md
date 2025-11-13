@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2025-11-13
+
+### Added
+- Added `CachedTtlEtagConfig` class for better configuration management
+- Added `copyWith()` method to `CachedTtlEtagConfig` for easy configuration modification
+
+### Changed
+- **BREAKING**: `CachedTtlEtagRepository` now accepts a single `CachedTtlEtagConfig` parameter instead of multiple individual parameters
+- Improved repository configuration pattern for better code organization and reusability
+
+### Migration Guide
+```dart
+// Before (v1.0.x)
+final repository = CachedTtlEtagRepository<MyModel>(
+  url: 'https://api.example.com/data',
+  fromJson: (json) => MyModel.fromJson(json),
+  method: 'GET',
+  headers: {'Authorization': 'Bearer token'},
+  defaultTtl: Duration(minutes: 5),
+);
+
+// After (v1.0.2)
+final config = CachedTtlEtagConfig<MyModel>(
+  url: 'https://api.example.com/data',
+  fromJson: (json) => MyModel.fromJson(json),
+  method: 'GET',
+  headers: {'Authorization': 'Bearer token'},
+  defaultTtl: Duration(minutes: 5),
+);
+final repository = CachedTtlEtagRepository<MyModel>(config);
+```
+
 ## [1.0.1] - 2025-11-10
 
 ### Added

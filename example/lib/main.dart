@@ -108,10 +108,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   void initState() {
     super.initState();
     _repository = CachedTtlEtagRepository<User>(
-      url: 'https://jsonplaceholder.typicode.com/users/${widget.userId}',
-      headers: {"accept": "application/json"},
-      fromJson: (json) => User.fromJson(json),
-      defaultTtl: const Duration(minutes: 5),
+      config: CachedTtlEtagConfig<User>(
+        url: 'https://jsonplaceholder.typicode.com/users/${widget.userId}',
+        headers: {"accept": "application/json"},
+        fromJson: (json) => User.fromJson(json),
+        defaultTtl: const Duration(minutes: 5),
+      ),
     );
   }
 
@@ -246,11 +248,14 @@ class _PostsListScreenState extends State<PostsListScreen> {
   void initState() {
     super.initState();
     _repository = CachedTtlEtagRepository<List<Post>>(
-      url: 'https://jsonplaceholder.typicode.com/posts',
-      method: "GET",
-      headers: {"accept": "application/json"},
-      fromJson: (json) => (json as List).map((e) => Post.fromJson(e)).toList(),
-      defaultTtl: const Duration(minutes: 10),
+      config: CachedTtlEtagConfig<List<Post>>(
+        url: 'https://jsonplaceholder.typicode.com/posts',
+        method: "GET",
+        headers: {"accept": "application/json"},
+        fromJson: (json) =>
+            (json as List).map((e) => Post.fromJson(e)).toList(),
+        defaultTtl: const Duration(minutes: 10),
+      ),
     );
   }
 
@@ -336,15 +341,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     _userRepo = CachedTtlEtagRepository<User>(
-      url: 'https://jsonplaceholder.typicode.com/users/1',
-      fromJson: (json) => User.fromJson(json),
-      defaultTtl: const Duration(minutes: 5),
+      config: CachedTtlEtagConfig(
+        url: 'https://jsonplaceholder.typicode.com/users/1',
+        fromJson: (json) => User.fromJson(json),
+        defaultTtl: const Duration(minutes: 5),
+      ),
     );
     _postsRepo = CachedTtlEtagRepository<List<Post>>(
-      url: 'https://jsonplaceholder.typicode.com/posts',
-      fromJson: (json) =>
-          (json as List).take(5).map((e) => Post.fromJson(e)).toList(),
-      defaultTtl: const Duration(minutes: 5),
+      config: CachedTtlEtagConfig(
+        url: 'https://jsonplaceholder.typicode.com/posts',
+        fromJson: (json) =>
+            (json as List).take(5).map((e) => Post.fromJson(e)).toList(),
+        defaultTtl: const Duration(minutes: 5),
+      ),
     );
   }
 

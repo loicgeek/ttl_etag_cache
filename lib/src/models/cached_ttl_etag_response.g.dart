@@ -117,7 +117,7 @@ const CachedTtlEtagResponseSchema = CollectionSchema(
   getId: _cachedTtlEtagResponseGetId,
   getLinks: _cachedTtlEtagResponseGetLinks,
   attach: _cachedTtlEtagResponseAttach,
-  version: '3.3.0-dev.3',
+  version: '3.3.0',
 );
 
 int _cachedTtlEtagResponseEstimateSize(

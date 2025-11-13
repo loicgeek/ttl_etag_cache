@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:isar_community/isar.dart';
+import 'package:neero_ttl_etag_cache/src/models/cache_ttl_etag_config.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../models/cached_ttl_etag_response.dart';
 import '../models/cache_ttl_etag_state.dart';
-import '../services/reactive_cache_dio.dart';
 
 /// Repository pattern implementation for cached data access
 ///
@@ -15,9 +15,11 @@ import '../services/reactive_cache_dio.dart';
 /// Example:
 /// ```dart
 /// final userRepo = CachedTtlEtagRepository<User>(
-///   url: 'https://api.example.com/user/123',
-///   fromJson: (json) => User.fromJson(json),
-///   defaultTtl: Duration(minutes: 5),
+///   config: CachedTtlEtagConfig<User>(
+///     url: 'https://api.example.com/user/123',
+///     fromJson: (json) => User.fromJson(json),
+///     defaultTtl: Duration(minutes: 5),
+///   ),
 /// );
 ///
 /// // Listen to state changes
@@ -34,45 +36,19 @@ import '../services/reactive_cache_dio.dart';
 /// userRepo.dispose();
 /// ```
 class CachedTtlEtagRepository<T> {
-  final ReactiveCacheDio _cache;
-  final String url;
-  final Map<String, dynamic>? body;
-  final String method;
-  final Map<String, String>? headers;
-  final Duration? defaultTtl;
-  final T Function(dynamic) fromJson;
-  final String Function(String url, Map<String, dynamic>? body)? getCacheKey;
-  final String Function(dynamic responseData)? getDataFromResponseData;
+  final CachedTtlEtagConfig<T> config;
 
   late final String _cacheKey;
   late final BehaviorSubject<CacheTtlEtagState<T>> _stateController;
   StreamSubscription? _cacheSubscription;
   StreamSubscription? _updateSubscription;
 
-  /// Create a new repository instance
+  /// Create a new repository instance with configuration
   ///
-  /// [url] - The URL to fetch data from
-  /// [fromJson] - Function to deserialize JSON to type T
-  /// [cache] - Optional ReactiveCacheDio instance (uses singleton by default)
-  /// [method] - HTTP method (default: GET)
-  /// [body] - Optional request body
-  /// [headers] - Optional HTTP headers
-  /// [defaultTtl] - Default time-to-live for cache entries
-  /// [getCacheKey] - Optional custom cache key generator
-  /// [getDataFromResponseData] - Optional response data extractor
-  CachedTtlEtagRepository({
-    required this.url,
-    required this.fromJson,
-    ReactiveCacheDio? cache,
-    this.method = 'GET',
-    this.body,
-    this.headers,
-    this.defaultTtl,
-    this.getCacheKey,
-    this.getDataFromResponseData,
-  }) : _cache = cache ?? ReactiveCacheDio() {
-    _cacheKey =
-        getCacheKey?.call(url, body) ?? _cache.generateCacheKey(url, body);
+  /// [config] - Configuration object containing all repository parameters
+  CachedTtlEtagRepository({required this.config}) {
+    _cacheKey = config.getCacheKey?.call(config.url, config.body) ??
+        config.cache.generateCacheKey(config.url, config.body);
     _stateController = BehaviorSubject<CacheTtlEtagState<T>>.seeded(
       const CacheTtlEtagState(isLoading: true),
     );
@@ -93,13 +69,13 @@ class CachedTtlEtagRepository<T> {
 
   void _initialize() {
     // Watch for cache changes in the database
-    _cacheSubscription = _cache.isar.cachedTtlEtagResponses
+    _cacheSubscription = config.cache.isar.cachedTtlEtagResponses
         .watchLazy(fireImmediately: true)
         .asyncMap((_) => _loadCacheEntry())
         .listen(_updateState);
 
     // Watch for cache update events
-    _updateSubscription = _cache.updateStream.listen((_) {
+    _updateSubscription = config.cache.updateStream.listen((_) {
       // State will be updated via _cacheSubscription
     });
 
@@ -108,7 +84,7 @@ class CachedTtlEtagRepository<T> {
   }
 
   Future<CachedTtlEtagResponse?> _loadCacheEntry() async {
-    return await _cache.isar.cachedTtlEtagResponses
+    return await config.cache.isar.cachedTtlEtagResponses
         .filter()
         .urlEqualTo(_cacheKey)
         .findFirst();
@@ -123,8 +99,8 @@ class CachedTtlEtagRepository<T> {
         // Get data based on encryption status
         String? rawData;
         if (cached.isEncrypted) {
-          if (_cache.isEncryptionEnabled) {
-            rawData = _cache.getDataFromCache(cached);
+          if (config.cache.isEncryptionEnabled) {
+            rawData = config.cache.getDataFromCache(cached);
           } else {
             // Can't decrypt without encryption enabled
             _stateController.add(currentState.copyWith(
@@ -139,7 +115,7 @@ class CachedTtlEtagRepository<T> {
         }
 
         if (rawData != null) {
-          data = fromJson(jsonDecode(rawData));
+          data = config.fromJson(jsonDecode(rawData));
         }
       } catch (e) {
         _stateController.add(currentState.copyWith(
@@ -185,16 +161,16 @@ class CachedTtlEtagRepository<T> {
     ));
 
     try {
-      await _cache.fetchReactive<T>(
-        url: url,
-        method: method,
-        body: body,
-        headers: headers,
-        defaultTtl: defaultTtl,
+      await config.cache.fetchReactive<T>(
+        url: config.url,
+        method: config.method,
+        body: config.body,
+        headers: config.headers,
+        defaultTtl: config.defaultTtl,
         forceRefresh: forceRefresh,
-        fromJson: fromJson,
-        getCacheKey: getCacheKey,
-        getDataFromResponseData: getDataFromResponseData,
+        fromJson: config.fromJson,
+        getCacheKey: config.getCacheKey,
+        getDataFromResponseData: config.getDataFromResponseData,
       );
 
       _stateController.add(_stateController.value.copyWith(
@@ -228,10 +204,10 @@ class CachedTtlEtagRepository<T> {
   /// await repo.invalidate();
   /// ```
   Future<void> invalidate() async {
-    await _cache.invalidate<T>(
-      url: url,
-      body: body,
-      getCacheKey: getCacheKey,
+    await config.cache.invalidate<T>(
+      url: config.url,
+      body: config.body,
+      getCacheKey: config.getCacheKey,
     );
   }
 

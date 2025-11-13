@@ -101,9 +101,11 @@ class UserRepository {
   
   UserRepository(String userId) {
     _repository = CachedTtlEtagRepository<User>(
-      url: 'https://api.example.com/users/$userId',
-      fromJson: (json) => User.fromJson(json),
-      defaultTtl: Duration(minutes: 5),
+      config: CachedTtlEtagConfig<User>(
+        url: 'https://api.example.com/users/$userId',
+        fromJson: (json) => User.fromJson(json),
+        defaultTtl: Duration(minutes: 5),
+      ),
     );
   }
   
