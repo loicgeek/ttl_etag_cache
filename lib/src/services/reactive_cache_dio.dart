@@ -4,8 +4,6 @@ import 'package:isar_community/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
 import '../../ttl_etag_cache.dart';
-import '../models/cached_ttl_etag_response.dart';
-import './encryption_service.dart';
 
 /// Core caching service with TTL, ETag support, and optional encryption
 ///
@@ -236,7 +234,7 @@ class ReactiveCacheDio {
             cached.ttlSeconds) {
       cached.isStale = true;
       await isar.writeTxn(() async {
-        await isar.cachedTtlEtagResponses.put(cached!);
+        await isar.cachedTtlEtagResponses.put(cached);
       });
       _updateStreamController.add(null);
     }
@@ -281,7 +279,7 @@ class ReactiveCacheDio {
         );
         cached.ttlSeconds = ttl.inSeconds;
         await isar.writeTxn(() async {
-          await isar.cachedTtlEtagResponses.put(cached!);
+          await isar.cachedTtlEtagResponses.put(cached);
         });
         _updateStreamController.add(null);
       } else {
@@ -294,14 +292,15 @@ class ReactiveCacheDio {
 
   /// Invalidate (delete) a specific cache entry
   ///
-  /// [url] - The URL of the cached resource
-  /// [body] - Optional request body used to generate the cache key
-  /// [getCacheKey] - Optional custom cache key generator
+  /// [config] - The configuration for the cache entry to invalidate
   ///
   /// Example:
   /// ```dart
   /// await cache.invalidate<User>(
-  ///   url: 'https://api.example.com/user/123',
+  ///   config: CacheTtlEtagConfig<User>(
+  ///     url: 'https://api.example.com/user/123',
+  ///     fromJson: (json) => User.fromJson(json),
+  ///   ),
   /// );
   /// ```
   Future<void> invalidate<T>({

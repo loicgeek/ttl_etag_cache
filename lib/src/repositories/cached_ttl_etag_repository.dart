@@ -162,15 +162,8 @@ class CachedTtlEtagRepository<T> {
 
     try {
       await config.cache.fetchReactive<T>(
-        url: config.url,
-        method: config.method,
-        body: config.body,
-        headers: config.headers,
-        defaultTtl: config.defaultTtl,
+        config: config,
         forceRefresh: forceRefresh,
-        fromJson: config.fromJson,
-        getCacheKey: config.getCacheKey,
-        getDataFromResponseData: config.getDataFromResponseData,
       );
 
       _stateController.add(_stateController.value.copyWith(
@@ -205,9 +198,7 @@ class CachedTtlEtagRepository<T> {
   /// ```
   Future<void> invalidate() async {
     await config.cache.invalidate<T>(
-      url: config.url,
-      body: config.body,
-      getCacheKey: config.getCacheKey,
+      config: config,
     );
   }
 
