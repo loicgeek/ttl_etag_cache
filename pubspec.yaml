@@ -4,8 +4,7 @@ version: 1.0.2
 homepage: https://github.com/loicgeek/ttl_etag_cache
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
-  flutter: ">=3.10.0"
+  sdk: ^3.9.2
 
 dependencies:
   flutter:

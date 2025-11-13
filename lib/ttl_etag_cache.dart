@@ -1,15 +1,15 @@
 library ttl_etag_cache;
 
 import 'package:dio/dio.dart';
-
+import 'src/models/cache_ttl_etag_config.dart';
 import 'src/services/reactive_cache_dio.dart';
 
 export 'src/interceptors/cache_ttl_etag_interceptor.dart';
-export 'src/models/cache_ttl_etag_config.dart';
 export 'src/models/cache_ttl_etag_state.dart';
 export 'src/models/cached_ttl_etag_response.dart';
 export 'src/repositories/cached_ttl_etag_repository.dart';
 export 'src/services/encryption_service.dart';
+export 'src/models/cache_ttl_etag_config.dart';
 
 /// Main entry point for Neero TTL/ETag Cache
 ///
@@ -54,14 +54,10 @@ class TtlEtagCache {
   /// );
   /// ```
   static Future<void> invalidate<T>({
-    required String url,
-    Map<String, dynamic>? body,
-    String Function(String url, Map<String, dynamic>? body)? getCacheKey,
+    required CacheTtlEtagConfig<T> config,
   }) async {
     return ReactiveCacheDio().invalidate<T>(
-      url: url,
-      body: body,
-      getCacheKey: getCacheKey,
+      config: config,
     );
   }
 
@@ -92,26 +88,12 @@ class TtlEtagCache {
   /// );
   /// ```
   static Future<void> refetch<T>({
-    required String url,
-    String method = 'GET',
-    Map<String, dynamic>? body,
-    Map<String, String>? headers,
-    Duration? defaultTtl,
+    required CacheTtlEtagConfig<T> config,
     bool forceRefresh = false,
-    required T Function(dynamic) fromJson,
-    String Function(String url, Map<String, dynamic>? body)? getCacheKey,
-    String Function(dynamic responseData)? getDataFromResponseData,
   }) async {
     return ReactiveCacheDio().fetchReactive<T>(
-      url: url,
-      method: method,
-      body: body,
-      headers: headers,
-      defaultTtl: defaultTtl,
+      config: config,
       forceRefresh: forceRefresh,
-      fromJson: fromJson,
-      getCacheKey: getCacheKey,
-      getDataFromResponseData: getDataFromResponseData,
     );
   }
 
