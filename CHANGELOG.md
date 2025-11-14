@@ -45,7 +45,7 @@ final repository = CachedTtlEtagRepository<MyModel>(config);
 ## [1.0.0] - 2025-11-10
 
 ### Added
-- Initial release of Neero TTL/ETag Cache
+- Initial release of TTL/ETag Cache
 - TTL (Time To Live) based cache expiration
 - ETag support for conditional HTTP requests
 - Optional AES-256 encryption for cached data

@@ -1,10 +1,10 @@
 # API Documentation
 
-Complete API reference for Neero TTL/ETag Cache.
+Complete API reference for TTL/ETag Cache.
 
 ## Table of Contents
 
-- [TtlEtagCache](#neerottletagcache)
+- [TtlEtagCache](#ttletagcache)
 - [CachedTtlEtagRepository](#cachedttletagrepository)
 - [CacheTtlEtagState](#cachettle tagstate)
 - [ReactiveCacheDio](#reactivecachedeo)

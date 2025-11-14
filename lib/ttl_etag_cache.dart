@@ -11,7 +11,7 @@ export 'src/repositories/cached_ttl_etag_repository.dart';
 export 'src/services/encryption_service.dart';
 export 'src/models/cache_ttl_etag_config.dart';
 
-/// Main entry point for Neero TTL/ETag Cache
+/// Main entry point for  TTL/ETag Cache
 ///
 /// A powerful, reactive caching solution for Flutter applications with:
 /// - TTL (Time To Live) support

@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Neero Cache Demo',
+      title: 'Cache Demo',
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       home: const HomeScreen(),
     );
@@ -29,7 +29,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Neero Cache Examples')),
+      appBar: AppBar(title: const Text('Cache Examples')),
       body: ListView(
         children: [
           ListTile(

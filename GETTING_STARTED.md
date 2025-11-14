@@ -1,4 +1,4 @@
-# Neero TTL/ETag Cache - Complete Plugin Package
+#TTL/ETag Cache - Complete Plugin Package
 
 ## 🎉 Package Complete!
 
