@@ -178,6 +178,27 @@ class CachedTtlEtagRepository<T> {
     }
   }
 
+  /// Get data from the cache
+  ///
+  /// This method:
+  /// 1. Sets loading state
+  /// 2. Calls the cache service to fetch data
+  /// 3. Updates state based on success or failure
+  ///
+  /// [forceRefresh] - If true, ignores cache and forces a network request
+  ///
+  /// Example:
+  /// ```dart
+  /// // Normal fetch (uses cache if valid)
+  /// await repo.get();
+  ///
+  /// // Force refresh (bypasses cache)
+  /// await repo.get(forceRefresh: true);
+  /// ```
+  Future<T?> get({bool forceRefresh = false}) async {
+    return config.cache.get<T>(config: config, forceRefresh: forceRefresh);
+  }
+
   /// Force refresh from the network
   ///
   /// Shorthand for `fetch(forceRefresh: true)`

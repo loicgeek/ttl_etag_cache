@@ -290,6 +290,131 @@ class ReactiveCacheDio {
     }
   }
 
+  /// Fetch data with reactive caching
+  ///
+  /// This method handles the complete fetch lifecycle:
+  /// 1. Check cache validity (TTL)
+  /// 2. Mark stale cache if expired
+  /// 3. Send conditional request (If-None-Match, If-Modified-Since)
+  /// 4. Handle 304 Not Modified or 200 OK
+  /// 5. Update cache with encryption if enabled
+  /// 6. Emit update event
+  ///
+  /// [url] - The URL to fetch
+  /// [method] - HTTP method (GET, POST, etc.)
+  /// [body] - Request body
+  /// [headers] - HTTP headers
+  /// [defaultTtl] - Default cache TTL if server doesn't specify
+  /// [forceRefresh] - Force refresh ignoring cache
+  /// [fromJson] - Function to deserialize response
+  /// [getCacheKey] - Optional custom cache key generator
+  /// [getDataFromResponseData] - Optional response data extractor
+  ///
+  /// Example:
+  /// ```dart
+  /// await cache.fetchReactive<User>(
+  ///   url: 'https://api.example.com/user',
+  ///   method: 'GET',
+  ///   defaultTtl: Duration(minutes: 5),
+  ///   fromJson: (json) => User.fromJson(json),
+  /// );
+  /// ```
+  Future<T?> get<T>({
+    required CacheTtlEtagConfig<T> config,
+    bool forceRefresh = false,
+  }) async {
+    Map<String, dynamic> headers = config.headers ?? {};
+    final cacheKey = config.getCacheKey?.call(config.url, config.body) ??
+        generateCacheKey(config.url, config.body);
+
+    CachedTtlEtagResponse? cached = await _getCachedEntry(cacheKey);
+
+    T? returnDatafromCache(CachedTtlEtagResponse cache) {
+      String? rawData;
+      if (cache.isEncrypted) {
+        rawData = config.cache.getDataFromCache(cache);
+      } else {
+        rawData = cache.data;
+      }
+
+      if (rawData != null) {
+        return config.fromJson(jsonDecode(rawData));
+      }
+      return null;
+    }
+
+    // Cache is fresh - return early
+    if (cached != null &&
+        !forceRefresh &&
+        DateTime.now().difference(cached.timestamp).inSeconds <
+            cached.ttlSeconds) {
+      return returnDatafromCache(cached);
+    }
+
+    // Cache is stale - mark it but continue to fetch
+    if (cached != null &&
+        DateTime.now().difference(cached.timestamp).inSeconds >=
+            cached.ttlSeconds) {
+      cached.isStale = true;
+      await isar.writeTxn(() async {
+        await isar.cachedTtlEtagResponses.put(cached);
+      });
+    }
+
+    // Add conditional request headers
+    if (cached != null) {
+      if (cached.etag != null) headers['If-None-Match'] = cached.etag!;
+      headers['If-Modified-Since'] = cached.timestamp.toUtc().toIso8601String();
+    }
+
+    try {
+      final response = await _dio.request(
+        config.url,
+        data: config.body,
+        options: Options(method: config.method, headers: headers),
+      );
+
+      final jsonData =
+          config.getDataFromResponseData?.call(response.data) ?? response.data;
+
+      final etag = response.headers.value('etag');
+      final ttl = _calculateTtl(
+        response.headers.map.map((k, v) => MapEntry(k, v.join(','))),
+        config.defaultTtl,
+      );
+
+      _storeCacheEntry(
+        cacheKey: cacheKey,
+        data: jsonEncode(jsonData),
+        etag: etag,
+        ttlSeconds: ttl.inSeconds,
+        existingId: cached?.id,
+      );
+
+      return config.fromJson(jsonData);
+    } on DioException catch (e) {
+      var response = e.response;
+      // Handle 304 Not Modified
+      if ((response?.statusCode ?? 0) == 304 && cached != null) {
+        cached.timestamp = DateTime.now();
+        cached.isStale = false;
+        final ttl = _calculateTtl(
+          response!.headers.map.map((k, v) => MapEntry(k, v.join(','))),
+          config.defaultTtl,
+        );
+        cached.ttlSeconds = ttl.inSeconds;
+        await isar.writeTxn(() async {
+          await isar.cachedTtlEtagResponses.put(cached);
+        });
+        return returnDatafromCache(cached);
+      } else {
+        rethrow;
+      }
+    } catch (_) {
+      rethrow;
+    }
+  }
+
   /// Invalidate (delete) a specific cache entry
   ///
   /// [config] - The configuration for the cache entry to invalidate
