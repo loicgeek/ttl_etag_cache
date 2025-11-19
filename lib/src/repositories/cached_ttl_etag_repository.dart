@@ -80,7 +80,9 @@ class CachedTtlEtagRepository<T> {
     });
 
     // Initial fetch
-    fetch();
+    if (config.autofetch == true) {
+      fetch();
+    }
   }
 
   Future<CachedTtlEtagResponse?> _loadCacheEntry() async {

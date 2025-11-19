@@ -11,6 +11,7 @@ class CacheTtlEtagConfig<T> {
   final T Function(dynamic) fromJson;
   final String Function(String url, Map<String, dynamic>? body)? getCacheKey;
   final String Function(dynamic responseData)? getDataFromResponseData;
+  final bool autofetch;
 
   /// Create a new configuration for CachedTtlEtagRepository
   ///
@@ -23,6 +24,7 @@ class CacheTtlEtagConfig<T> {
   /// [defaultTtl] - Default time-to-live for cache entries
   /// [getCacheKey] - Optional custom cache key generator
   /// [getDataFromResponseData] - Optional response data extractor
+  /// [autofetch] - Whether to automatically fetch data on repository creation
   CacheTtlEtagConfig({
     required this.url,
     required this.fromJson,
@@ -33,6 +35,7 @@ class CacheTtlEtagConfig<T> {
     this.defaultTtl,
     this.getCacheKey,
     this.getDataFromResponseData,
+    this.autofetch = true,
   }) : cache = cache ?? ReactiveCacheDio();
 
   /// Create a copy of this config with some fields replaced
@@ -46,6 +49,7 @@ class CacheTtlEtagConfig<T> {
     T Function(dynamic)? fromJson,
     String Function(String url, Map<String, dynamic>? body)? getCacheKey,
     String Function(dynamic responseData)? getDataFromResponseData,
+    bool? autofetch,
   }) {
     return CacheTtlEtagConfig<T>(
       cache: cache ?? this.cache,
@@ -58,6 +62,7 @@ class CacheTtlEtagConfig<T> {
       getCacheKey: getCacheKey ?? this.getCacheKey,
       getDataFromResponseData:
           getDataFromResponseData ?? this.getDataFromResponseData,
+      autofetch: autofetch ?? this.autofetch,
     );
   }
 }
