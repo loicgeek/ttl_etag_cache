@@ -136,6 +136,20 @@ class TtlEtagCache {
     );
   }
 
+  /// Get cache statistics
+  ///
+  /// Returns information about the current cache state
+  ///
+  /// Example:
+  /// ```dart
+  /// final stats = await TtlEtagCache.getStatistics();
+  /// print('Total entries: ${stats.totalEntries}');
+  /// print('Encrypted entries: ${stats.encryptedEntries}');
+  /// ```
+  static Future<CacheStatistics> getStatistics() {
+    return ReactiveCacheDio().getStatistics();
+  }
+
   /// Check if encryption is currently enabled
   static bool get isEncryptionEnabled => ReactiveCacheDio().isEncryptionEnabled;
 }
