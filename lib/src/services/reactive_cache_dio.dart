@@ -584,13 +584,23 @@ class ReactiveCacheDio {
     final stale = all.where((e) => e.isStale).length;
     final expired = all.where((e) => e.isExpired).length;
 
+    // Compute sizes dynamically
+    int totalSizeBytes = 0;
+    for (final entry in all) {
+      if (entry.encryptedData != null) {
+        totalSizeBytes += utf8.encode(entry.encryptedData!).length;
+      } else if (entry.data != null) {
+        totalSizeBytes += utf8.encode(entry.data!).length;
+      }
+    }
+
     return CacheStatistics(
-      totalEntries: all.length,
-      encryptedEntries: encrypted,
-      plainEntries: all.length - encrypted,
-      staleEntries: stale,
-      expiredEntries: expired,
-    );
+        totalEntries: all.length,
+        encryptedEntries: encrypted,
+        plainEntries: all.length - encrypted,
+        staleEntries: stale,
+        expiredEntries: expired,
+        totalSizeBytes: totalSizeBytes);
   }
 }
 
@@ -601,6 +611,7 @@ class CacheStatistics {
   final int plainEntries;
   final int staleEntries;
   final int expiredEntries;
+  final int totalSizeBytes;
 
   const CacheStatistics({
     required this.totalEntries,
@@ -608,11 +619,12 @@ class CacheStatistics {
     required this.plainEntries,
     required this.staleEntries,
     required this.expiredEntries,
+    required this.totalSizeBytes,
   });
 
   @override
   String toString() {
     return 'CacheStatistics(total: $totalEntries, encrypted: $encryptedEntries, '
-        'plain: $plainEntries, stale: $staleEntries, expired: $expiredEntries)';
+        'plain: $plainEntries, stale: $staleEntries, expired: $expiredEntries, totalSizeBytes: $totalSizeBytes)';
   }
 }
