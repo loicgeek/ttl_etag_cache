@@ -322,12 +322,11 @@ class ReactiveCacheDio {
   Future<T?> get<T>({
     required CacheTtlEtagConfig<T> config,
     bool forceRefresh = false,
+    bool? forceCache,
   }) async {
     Map<String, dynamic> headers = config.headers ?? {};
     final cacheKey = config.getCacheKey?.call(config.url, config.body) ??
         generateCacheKey(config.url, config.body);
-
-    CachedTtlEtagResponse? cached = await _getCachedEntry(cacheKey);
 
     T? returnDatafromCache(CachedTtlEtagResponse cache) {
       String? rawData;
@@ -341,6 +340,14 @@ class ReactiveCacheDio {
         return config.fromJson(jsonDecode(rawData));
       }
       return null;
+    }
+
+    CachedTtlEtagResponse? cached = await _getCachedEntry(cacheKey);
+    if (forceCache == true) {
+      if (cached == null) {
+        return null;
+      }
+      return returnDatafromCache(cached);
     }
 
     // Cache is fresh - return early

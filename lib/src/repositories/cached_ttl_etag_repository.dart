@@ -197,8 +197,9 @@ class CachedTtlEtagRepository<T> {
   /// // Force refresh (bypasses cache)
   /// await repo.get(forceRefresh: true);
   /// ```
-  Future<T?> get({bool forceRefresh = false}) async {
-    return config.cache.get<T>(config: config, forceRefresh: forceRefresh);
+  Future<T?> get({bool forceRefresh = false, bool? forceCache}) async {
+    return config.cache.get<T>(
+        config: config, forceRefresh: forceRefresh, forceCache: forceCache);
   }
 
   /// Force refresh from the network
