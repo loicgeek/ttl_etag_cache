@@ -15,8 +15,8 @@ dependencies:
   dio: ^5.9.0
   
   # Local database
-  isar_community: ^3.3.0-dev.3
-  isar_community_flutter_libs: ^3.3.0-dev.3
+  isar_community: ^3.3.0
+  isar_community_flutter_libs: ^3.3.0
   
   # Reactive streams
   rxdart: ^0.28.0
