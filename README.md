@@ -776,4 +776,4 @@ For issues, questions, or suggestions, please open an issue on our GitHub reposi
 
 ---
 
-Made with ❤️ by the [Loic NGOU](https://github.com/loicgeek)
+Made with ❤️ by [Loic NGOU](https://github.com/loicgeek)
