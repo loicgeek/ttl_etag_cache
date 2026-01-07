@@ -1,6 +1,6 @@
 # Migration Guide
 
-Guide for migrating between different versions and configurations of Neero TTL/ETag Cache.
+Guide for migrating between different versions and configurations of TTL/ETag Cache.
 
 ## Table of Contents
 

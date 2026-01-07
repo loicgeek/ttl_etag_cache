@@ -1,6 +1,6 @@
 name: ttl_etag_cache
 description: A powerful, reactive caching solution for Flutter with TTL, ETag support, and optional AES-256 encryption for offline-first applications.
-version: 1.0.3
+version: 1.0.4
 homepage: https://github.com/loicgeek/ttl_etag_cache
 
 environment:

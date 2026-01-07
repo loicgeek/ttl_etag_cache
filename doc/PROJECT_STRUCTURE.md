@@ -1,6 +1,6 @@
 # Project Structure
 
-Complete overview of the Neero TTL/ETag Cache plugin structure.
+Complete overview of the TTL/ETag Cache plugin structure.
 
 ```
 ttl_etag_cache/

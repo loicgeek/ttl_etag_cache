@@ -12,7 +12,7 @@ class EncryptionService {
   encrypt.Encrypter? _encrypter;
   final _secureStorage = const FlutterSecureStorage();
 
-  static const String _keyStorageKey = 'neero_cache_encryption_key';
+  static const String _keyStorageKey = 'ttl_etag_cache_encryption_key';
   bool _isInitialized = false;
 
   EncryptionService._();
