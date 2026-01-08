@@ -11,6 +11,7 @@ class CacheTtlEtagConfig<T> {
   final T Function(dynamic) fromJson;
   final String Function(String url, Map<String, dynamic>? body)? getCacheKey;
   final String Function(dynamic responseData)? getDataFromResponseData;
+  final bool Function(dynamic responseData)? validateResponseData;
   final bool autofetch;
 
   /// Create a new configuration for CachedTtlEtagRepository
@@ -25,6 +26,7 @@ class CacheTtlEtagConfig<T> {
   /// [getCacheKey] - Optional custom cache key generator
   /// [getDataFromResponseData] - Optional response data extractor
   /// [autofetch] - Whether to automatically fetch data on repository creation
+  /// [validateResponseData] - Optional response data validator returns true if valid and otherwise false
   CacheTtlEtagConfig({
     required this.url,
     required this.fromJson,
@@ -35,6 +37,7 @@ class CacheTtlEtagConfig<T> {
     this.defaultTtl,
     this.getCacheKey,
     this.getDataFromResponseData,
+    this.validateResponseData,
     this.autofetch = true,
   }) : cache = cache ?? ReactiveCacheDio();
 
@@ -49,6 +52,7 @@ class CacheTtlEtagConfig<T> {
     T Function(dynamic)? fromJson,
     String Function(String url, Map<String, dynamic>? body)? getCacheKey,
     String Function(dynamic responseData)? getDataFromResponseData,
+    bool Function(dynamic responseData)? validateResponseData,
     bool? autofetch,
   }) {
     return CacheTtlEtagConfig<T>(
@@ -62,6 +66,7 @@ class CacheTtlEtagConfig<T> {
       getCacheKey: getCacheKey ?? this.getCacheKey,
       getDataFromResponseData:
           getDataFromResponseData ?? this.getDataFromResponseData,
+      validateResponseData: validateResponseData ?? this.validateResponseData,
       autofetch: autofetch ?? this.autofetch,
     );
   }
