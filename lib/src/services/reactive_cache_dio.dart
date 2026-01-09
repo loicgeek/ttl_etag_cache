@@ -252,6 +252,14 @@ class ReactiveCacheDio {
         options: Options(method: config.method, headers: headers),
       );
 
+      if (config.validateResponseData != null &&
+          !config.validateResponseData!.call(response.data)) {
+        throw DioException(
+          response: response,
+          requestOptions: response.requestOptions,
+        );
+      }
+
       final jsonData =
           config.getDataFromResponseData?.call(response.data) ?? response.data;
       final etag = response.headers.value('etag');
