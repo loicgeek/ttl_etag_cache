@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added `getOrFetch` method for simple cache-or-fetch operations
 - Added `forceCache` parameter to `get` method
+- Added `validateResponseData` optional callback to `CacheTtlEtagConfig` to validate response data before processing
+- Response validation now throws `DioException` when validation fails, allowing custom response data validation logic
 
 ## [1.0.4] - 2026-01-07
 
