@@ -422,6 +422,82 @@ class ReactiveCacheDio {
     }
   }
 
+  /// Returns the cached value immediately if it is still fresh.
+  /// If the cache is missing or expired, fetches from the network,
+  /// stores the result, and returns it — no ETag / stale-marking logic.
+  ///
+  /// Use this when you simply need a value and do not care about
+  /// reactive updates or conditional requests.
+  ///
+  /// [config]       - Cache + request configuration.
+  /// [forceRefresh] - When `true` the cache is ignored and a fresh
+  ///                  network request is always made.
+  ///
+  /// Returns `null` only if the network response cannot be parsed.
+  ///
+  /// Example:
+  /// ```dart
+  /// final user = await cache.getOrFetch<User>(
+  ///   config: CacheTtlEtagConfig<User>(
+  ///     url: 'https://api.example.com/user/42',
+  ///     fromJson: (json) => User.fromJson(json),
+  ///     defaultTtl: Duration(minutes: 10),
+  ///   ),
+  /// );
+  /// ```
+  Future<T> getOrFetch<T>({
+    required CacheTtlEtagConfig<T> config,
+    bool forceRefresh = false,
+  }) async {
+    final cacheKey = config.getCacheKey?.call(config.url, config.body) ??
+        generateCacheKey(config.url, config.body);
+
+    T? _decode(CachedTtlEtagResponse entry) {
+      final raw = entry.isEncrypted ? getDataFromCache(entry) : entry.data;
+      if (raw == null) return null;
+      return config.fromJson(jsonDecode(raw));
+    }
+
+    final cached = await _getCachedEntry(cacheKey);
+
+    // Return the cached value immediately when it is still within its TTL.
+    if (cached != null && !forceRefresh) {
+      final decoded = _decode(cached);
+      if (decoded != null) {
+        return decoded;
+      }
+    }
+
+    // Cache is missing or expired — fetch from network.
+    final response = await _dio.request(
+      config.url,
+      data: config.body,
+      options: Options(
+        method: config.method,
+        headers: config.headers,
+      ),
+    );
+
+    final jsonData =
+        config.getDataFromResponseData?.call(response.data) ?? response.data;
+
+    final etag = response.headers.value('etag');
+    final ttl = _calculateTtl(
+      response.headers.map.map((k, v) => MapEntry(k, v.join(','))),
+      config.defaultTtl,
+    );
+
+    await _storeCacheEntry(
+      cacheKey: cacheKey,
+      data: jsonEncode(jsonData),
+      etag: etag,
+      ttlSeconds: ttl.inSeconds,
+      existingId: cached?.id,
+    );
+
+    return config.fromJson(jsonData);
+  }
+
   /// Invalidate (delete) a specific cache entry
   ///
   /// [config] - The configuration for the cache entry to invalidate

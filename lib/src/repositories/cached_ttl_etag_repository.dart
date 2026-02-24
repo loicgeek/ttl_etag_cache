@@ -199,7 +199,32 @@ class CachedTtlEtagRepository<T> {
   /// ```
   Future<T?> get({bool forceRefresh = false, bool? forceCache}) async {
     return config.cache.get<T>(
-        config: config, forceRefresh: forceRefresh, forceCache: forceCache);
+      config: config,
+      forceRefresh: forceRefresh,
+      forceCache: forceCache,
+    );
+  }
+
+  /// Get data from the cache or fetch from network if needed
+  ///
+  /// This method provides a simple cache-or-fetch behavior without
+  /// the complexity of reactive updates or conditional requests.
+  ///
+  /// [forceRefresh] - If true, ignores cache and forces a network request
+  ///
+  /// Example:
+  /// ```dart
+  /// // Get data from cache or fetch if needed
+  /// final data = await repo.getOrFetch();
+  ///
+  /// // Force refresh from network
+  /// final freshData = await repo.getOrFetch(forceRefresh: true);
+  /// ```
+  Future<T> getOrFetch({bool forceRefresh = false}) async {
+    return config.cache.getOrFetch<T>(
+      config: config,
+      forceRefresh: forceRefresh,
+    );
   }
 
   /// Force refresh from the network
