@@ -466,17 +466,49 @@ class ReactiveCacheDio {
       return config.fromJson(jsonDecode(raw));
     }
 
+    Future<void> _fetchAndStore({Id? existingId}) async {
+      try {
+        final response = await _dio.request(
+          config.url,
+          data: config.body,
+          options: Options(
+            method: config.method,
+            headers: config.headers,
+          ),
+        );
+
+        final jsonData = config.getDataFromResponseData?.call(response.data) ??
+            response.data;
+        final etag = response.headers.value('etag');
+        final ttl = _calculateTtl(
+          response.headers.map.map((k, v) => MapEntry(k, v.join(','))),
+          config.defaultTtl,
+        );
+
+        await _storeCacheEntry(
+          cacheKey: cacheKey,
+          data: jsonEncode(jsonData),
+          etag: etag,
+          ttlSeconds: ttl.inSeconds,
+          existingId: existingId,
+        );
+      } catch (_) {
+        // Background refresh — swallow errors silently
+      }
+    }
+
     final cached = await _getCachedEntry(cacheKey);
 
-    // Return the cached value immediately when it is still within its TTL.
     if (cached != null && !forceRefresh) {
       final decoded = _decode(cached);
       if (decoded != null) {
+        // Return cached value immediately, refresh in background
+        unawaited(_fetchAndStore(existingId: cached.id));
         return decoded;
       }
     }
 
-    // Cache is missing or expired — fetch from network.
+    // No usable cache — fetch synchronously and return
     final response = await _dio.request(
       config.url,
       data: config.body,
@@ -488,7 +520,6 @@ class ReactiveCacheDio {
 
     final jsonData =
         config.getDataFromResponseData?.call(response.data) ?? response.data;
-
     final etag = response.headers.value('etag');
     final ttl = _calculateTtl(
       response.headers.map.map((k, v) => MapEntry(k, v.join(','))),
